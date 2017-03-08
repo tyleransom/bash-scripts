@@ -1,0 +1,48 @@
+#!/bin/sh
+# ***************************************************************************
+# find_replace_in_files_input
+# Performs a recursive, case-sensitive directory find and replace of files
+# For case-insensitive, use the -i switch in the grep call
+# ***************************************************************************
+
+# IFS (Internal Field Separator) default is whitespace, which is a 
+# problem if there are spaces in the file path. Change IFS to carriage 
+# return instead
+IFS_backup=$IFS
+IFS=$'\n'
+
+echo "*******************************************************************"
+echo "*              Find and Replace in Files Version 1.0              *"
+echo "*******************************************************************"
+if [ "$#" -ne 2 ]; then
+	echo "The 'find_replace_in_files_input' script performs a recursive,"
+	echo "case-sensitive directory find and replace of files."
+	echo ""
+	echo "Usage is:"
+	echo "     find_replace_in_files_input <\"searchterm\"> <\"replaceterm\">"
+	echo ""
+	echo "Quotes surround terms. Spaces in the terms may cause failure."
+	echo "Certain characters must be escaped (\/, etc)."
+	echo ""
+else
+	startdirectory=$PWD
+	searchterm=$1
+	replaceterm=$2
+
+	# get file names and store as loop variable $file
+	for file in $(grep -l -R $searchterm $startdirectory)
+	do
+		# extract modification date and time of file
+		MODTIME=`stat -c %Y "$file"`
+		HMODTIME=`date -d @"$MODTIME"`
+		# make the replacement with sed and update file
+		sed -i "s/$searchterm/$replaceterm/ig" "$file"
+		# change the modification date of the file back to the original date
+		touch -d @$MODTIME "$file"
+		echo "Modified: " "$file"
+		echo "Modification date/time: " $HMODTIME "(sec since epoch: "$MODTIME")"
+	done
+	echo " *** Yay! All Done! *** "
+fi
+# change IFS back to whitespace
+IFS=IFS_backup

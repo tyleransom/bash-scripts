@@ -1,0 +1,30 @@
+#!/bin/sh
+# ps2eps	encapsulates *.ps files
+
+# Usage:	ps2eps file.ps	# generates file.eps
+
+# see if it's already done:
+if grep -q '^%%BoundingBox:' $1
+  then
+	echo "$1 appears to be encapsulated already."
+	exit
+fi
+
+
+# Create output filename:
+if echo $1 | grep -q '.ps$'
+  then
+	filename=`basename $1 .ps`
+else
+	filename=$1
+fi
+
+filename=${filename}.eps
+
+
+# Use gs to determine BoundingBox:
+BB=`gs -dBATCH -dNOPAUSE -sDEVICE=bbox -q $1 2>&1 | grep '%%BoundingBox'`
+
+# edit it into the PS file with sed:
+sed '1a\
+'"$BB"' < $1 > $filename

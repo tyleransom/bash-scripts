@@ -1,0 +1,84 @@
+#!/bin/bash
+
+#
+# Statampbatch will prepare and submit a Stata-MP job to the SLURM queue on the 
+# econ cluster
+#
+# Original script written by Tyler Ransom.
+#
+
+# Set the partition to common if not otherwise defined
+if [ -z $CLUSTER_PARTITION ] ; then
+  export CLUSTER_PARTITION="common"
+fi
+
+# Set the memory allocations
+if [ $CLUSTER_PARTITION == "faculty-lm" ] ; then
+  JOB_MEM_SIZE="512000"
+else
+  JOB_MEM_SIZE="64000"
+fi
+
+# Test usage; if incorrect, output correct usage
+if [ "$#" -gt 2  -o  "$#" -eq 0 ]; then
+	echo "**************************************************************************"
+	echo "*                        Statampbatch version 0.1                        *"
+	echo "**************************************************************************"
+	echo "The 'statampbatch' script submits Stata-MP batch jobs to the Econ cluster."
+	echo ""
+	echo "Usage is:"
+	echo "         statampbatch <input_file>"
+	echo ""
+	echo "Spaces in the filename or directory name may cause failure."
+	echo ""
+else
+	# Stem and extension of file
+	filestem=`echo $1 | cut -f1 -d.`
+	extension=`echo $1 | cut -f2 -d.`
+	
+	# Test if file exist
+	if [ ! -r $1 -a ! -r $1.do ]; then
+		echo ""
+		echo "File does not exist"
+		echo ""
+	elif [ $extension != do ]; then
+		echo ""
+		echo "Invalid input file, must be a do-file"
+		echo ""
+	else
+		# Direct output, conditional on number of arguments
+		if [ "$#" -eq 1 ]; then
+			output=$filestem.log
+		else
+			output=$2
+		fi
+		
+		# Use user-defined 'TMPDIR' if possible; else, use /tmp
+		if [[ -n $TMPDIR ]]; then
+			pathy=$TMPDIR
+		else
+			pathy=/tmp
+		fi
+		
+		# Tempfile for the script
+		shell=`mktemp $pathy/shell.XXXXXX` || exit 1
+		chmod 700 $shell
+		
+		# Create script
+		echo "#!/bin/bash"                                 >> $shell
+		
+		# SLURM metacommands
+		echo "#SBATCH --job-name=statampbatch"             >> $shell
+		echo "#SBATCH --output=$output"                    >> $shell
+		echo "#SBATCH --mail-type=END"                     >> $shell
+		echo "#SBATCH --mail-user=$USER@duke.edu"          >> $shell
+		# echo "#SBATCH --time=1:00:00:00"                 >> $shell
+		echo "#SBATCH --mem-per-cpu=${JOB_MEM_SIZE}"       >> $shell
+		echo "#SBATCH --nodelist=comp-node-18"             >> $shell
+		echo "pwd"                                         >> $shell
+		echo "date"                                        >> $shell
+		echo "srun /econ/sw/bin/stata-mp -b do  $filestem" >> $shell
+		sbatch --partition ${CLUSTER_PARTITION} $shell
+	fi
+fi
+

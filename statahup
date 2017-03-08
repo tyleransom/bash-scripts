@@ -1,0 +1,90 @@
+#!/bin/sh
+# statahup will prepare and submit a Stata-SE/MP job and email the user when it
+# is finished
+# new to 2.1 - added option functionality
+#            - added option to suppress email
+#            - added option to use stata-mp instead of stata-se
+#            - adjusted how errors are handled
+
+### Setup options; if incorrect, notify of error and exit
+email=yes
+version=stata-se
+while getopts ':em' opt ; do
+	case $opt in
+		e) email=no ;;
+		m) version=stata-mp;;
+		\?) echo "Invalid option: -$OPTARG" 
+		    exit ;;
+	esac
+done
+# skip over the processed options
+shift $((OPTIND-1)) 
+
+### Test if version exists
+if ! hash $version; then
+	echo -e "\n $version does not exist \n"
+	exit
+fi
+
+### Test usage; if incorrect, output correct usage and exit
+if [ "$#" -ne 1 ]; then
+	echo "********************************************************************"
+	echo "*                       Statahup version 2.1                       *"
+	echo "********************************************************************"
+	echo -e "The 'statahup' script submits Stata batch jobs using nohup. \n"
+	echo -e "usage: statahup [-em] file.do \n"
+	echo -e "Spaces in the filename or directory name may cause failure. \n"
+	exit
+fi
+# Stem and extension of file
+filestem=`echo $1 | cut -f1 -d.`
+extension=`echo $1 | cut -f2 -d.`
+
+### Test if file exist
+if [[ ! -r $1 ]]; then
+	echo -e "\n File does not exist, or option mispecified \n"
+	exit
+fi
+
+### Test file extension
+if [[ $extension != do ]]; then
+	echo -e "\n Invalid input file, must be a do-file \n"
+	exit
+fi
+
+### Main file
+# Direct output
+output=$filestem.log
+echo "stata: directing output to $output"
+
+# Use user-defined 'TMPDIR' if possible; else, use /tmp
+if [[ -n $TMPDIR ]]; then
+	pathy=$TMPDIR
+else
+	pathy=/tmp
+fi
+
+# Tempfile to enable emailing content
+timer=`mktemp $pathy/timer.XXXXXX` || exit 1
+chmod 600 $timer
+
+# Tempfile for the script
+shell=`mktemp $pathy/shell.XXXXXX` || exit 1
+chmod 700 $shell
+
+# Create email body: path, filename, and start time
+starter=`date`
+echo "$PWD/$1 finished" >> $timer
+echo "$starter S"       >> $timer
+
+# Create script; add end time to email subject
+echo "#!/bin/sh"                                                                           >> $shell
+echo "time -p $version -b do $1 "                                                          >> $shell
+echo "date >> $timer"                                                                      >> $shell
+if [[ $email == "yes" ]]; then
+	echo "mutt -s \"$1 finished\" -a $output nohup.out -- $USER@duke.edu < $timer"         >> $shell
+fi
+nohup $shell &
+
+# Nohup takes a split second longer than other commands
+sleep 0.01s

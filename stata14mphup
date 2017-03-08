@@ -1,0 +1,72 @@
+#!/bin/sh
+# statamphup will prepare and submit a Stata-MP job and email the user when it
+# is finished
+
+# Test usage; if incorrect, output correct usage
+if [ "$#" -ne 1 ]; then
+	echo "********************************************************************"
+	echo "*                      Statamphup version 2.0                      *"
+	echo "********************************************************************"
+	echo "The 'statamphup' script submits Stata-MP batch jobs using nohup."
+	echo ""
+	echo "Usage is:"
+	echo "	       statamphup <stata_do_file.do>"
+	echo ""
+	echo "Spaces in the filename or directory name may cause failure."
+	echo ""
+
+
+else
+	# Stem and extension of file
+	filestem=`echo $1 | cut -f1 -d.`
+	extension=`echo $1 | cut -f2 -d.`
+
+	# Test if file exist
+	if [[ ! -r $1 ]]; then
+		echo ""
+		echo "File does not exist"
+		echo ""
+	elif [[ $extension != do ]]; then
+		echo ""
+		echo "Invalid input file, must be an m-file"
+		echo ""
+	else
+		# Direct output
+		output=$filestem.log
+		echo "stata: directing output to $output"
+
+		
+		
+		
+		
+		# Use user-defined 'TMPDIR' if possible; else, use /tmp
+		if [[ -n $TMPDIR ]]; then
+			pathy=$TMPDIR
+		else
+			pathy=/tmp
+		fi
+		
+		# Tempfile to enable emailing content
+		timer=`mktemp $pathy/timer.XXXXXX` || exit 1
+		chmod 600 $timer
+		
+		# Tempfile for the script
+		shell=`mktemp $pathy/shell.XXXXXX` || exit 1
+		chmod 700 $shell
+		
+		# Create email body: path, filename, and start time
+		starter=`date`
+		echo "$PWD/$1 finished" >> $timer
+		echo "$starter S"       >> $timer
+
+		# Create script; add end time to email subject
+		echo "#!/bin/sh"                                                                           >> $shell
+		echo "time -p /usr/local/stata14mp/stata-mp -b do $1 "                                     >> $shell
+		echo "date >> $timer"                                                                      >> $shell
+		echo "mutt -s \"$1 finished\" -a $output nohup.out -- $USER@duke.edu < $timer"             >> $shell
+		nohup $shell &
+		
+		# Nohup takes a split second longer than other commands
+		sleep 0.01s
+	fi
+fi

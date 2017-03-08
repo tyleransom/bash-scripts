@@ -4,11 +4,11 @@ This is a random collection of useful shell scripts that I have accumulated over
 * **`compiler`:** Script to compile LaTeX files into PDFs. Syntax is `compiler myfile.tex` which produces `myfile.pdf` in the working directory.
 * **`ducustom`:** Custom disk usage that displays files sorted by size (largest to smallest) with arbitrary folder depth, e.g. `ducustom 2` lists all files and directories in the current folder as well as its subfolder. Helpful for finding large files.
 * **`find_replace_in_files`:** Find and replace text in all files of a (set of) directories. Useful if workflow is dependent on file paths, and you just migrated servers.
-* **`git_find_big`:** Find large files in a git tree. Found [http://stackoverflow.com/questions/10622179/how-to-find-identify-large-files-commits-in-git-history](here).
-* **`pdf2eps`:** Convert PDF files to EPS format. Found [http://tex.stackexchange.com/questions/20883/how-to-convert-pdf-to-eps](here).
-* **`ps2eps`:** Convert PS files to EPS format (i.e. "encapsulate" them). Found [http://aty.sdsu.edu/~aty/bibliog/latex/PSandEPS.html](here).
-* **`shellexec`:** Submit a generic shell script using `nohup`.
+* **`git_find_big`:** Find large files in a git tree. Found [here](http://stackoverflow.com/questions/10622179/how-to-find-identify-large-files-commits-in-git-history).
+* **`pdf2eps`:** Convert PDF files to EPS format. Found [here](http://tex.stackexchange.com/questions/20883/how-to-convert-pdf-to-eps).
+* **`ps2eps`:** Convert PS files to EPS format (i.e. "encapsulate" them). Found [here](http://aty.sdsu.edu/~aty/bibliog/latex/PSandEPS.html).
+* **`shellexec`:** Submit a generic shell script using `nohup` and send email upon completion.
 * **`statampbatch`:** Sample SLURM script for running a program in Stata-MP. Note that SLURM configurations differ by server, so check with your admin before attempting to use this.
-* **`*hup`:** Commands for running scripts for various statistical analysis programs using `nohup`. Includes capabilities for R, Julia, Stata, SAS, and Matlab.
+* **`*hup`:** Commands for submitting various statistical program scripts using `nohup` and sending email upon completion. Includes capabilities for Julia, Matlab, R, Stata, and SAS.
 
-Finally, many of these files were created with the help of @jaredashworth, so I acknowledge his help.
+Finally, many of these files were created with the help of [Jared Ashworth](https://github.com/jaredashworth), which I gratefully acknowledge.

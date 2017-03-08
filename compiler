@@ -28,5 +28,6 @@ bibtex $filestem.aux
 bibtex $filestem.aux
 latex $filestem.tex
 bibtex $filestem.aux
+latex $filestem.tex
 dvips -P pdf $filestem.dvi
 ps2pdf $filestem.ps

@@ -2,6 +2,7 @@
 This is a random collection of useful shell scripts that I have accumulated over time. To use them, make sure you mark them as executable and place them in a folder on the path. My preferred location is ~/bin/.
 
 * **`compiler`:** Script to compile LaTeX files into PDFs. Syntax is `compiler myfile.tex` which produces `myfile.pdf` in the working directory.
+* **`compilerClean`:** Script to compile LaTeX files into PDFs, but also remove all ancillary files that are not `.tex` source or `.pdf` output. Syntax is `compilerClean myfile.tex` which produces `myfile.pdf` in the working directory and deletes all intermediate compilation files.
 * **`ducustom`:** Custom disk usage that displays files sorted by size (largest to smallest) with arbitrary folder depth, e.g. `ducustom 2` lists all files and directories in the current folder as well as its subfolder. Helpful for finding large files.
 * **`find_replace_in_files`:** Find and replace text in all files of a (set of) directories. Useful if workflow is dependent on file paths, and you just migrated servers.
 * **`find_replace_in_files_input`:** Similar to find_replace_in_files, but it allows you to execute the command from the terminal at the top of the directory tree you want to make changes in.

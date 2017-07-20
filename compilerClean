@@ -1,0 +1,42 @@
+#!/bin/sh
+
+### Test usage; if incorrect, output correct usage and exit
+if [ "$#" -gt 1  -o  "$#" -eq 0 ]; then
+	echo "Compilation error"
+	exit
+fi
+# Stem and extension of file
+filestem=`echo $1 | cut -f1 -d.`
+extension=`echo $1 | cut -f2 -d.`
+
+### Test if file exist
+if [[ ! -r $1 ]]; then
+	echo -e "\n File does not exist, or option mispecified \n"
+	exit
+fi
+
+### Test file extension
+if [[ $extension != tex ]]; then
+	echo -e "\n Invalid input file, must be a tex-file \n"
+	exit
+fi
+
+latex $filestem.tex
+bibtex $filestem.aux
+latex $filestem.tex
+bibtex $filestem.aux
+bibtex $filestem.aux
+latex $filestem.tex
+bibtex $filestem.aux
+latex $filestem.tex
+latex $filestem.tex
+dvips -P pdf $filestem.dvi
+ps2pdf $filestem.ps
+[[ -f "$filestem.bbl" ]] && rm "$filestem.bbl"
+[[ -f "$filestem.out" ]] && rm "$filestem.out"
+[[ -f "$filestem.aux" ]] && rm "$filestem.aux"
+[[ -f "$filestem.blg" ]] && rm "$filestem.blg"
+[[ -f "$filestem.nav" ]] && rm "$filestem.nav"
+[[ -f "$filestem.dvi" ]] && rm "$filestem.dvi"
+[[ -f "$filestem.ps" ]]  && rm "$filestem.ps"
+[[ -f "$filestem.log" ]] && rm "$filestem.log"

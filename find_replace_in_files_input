@@ -36,7 +36,7 @@ else
 		MODTIME=`stat -c %Y "$file"`
 		HMODTIME=`date -d @"$MODTIME"`
 		# make the replacement with sed and update file
-		sed -i "s/$searchterm/$replaceterm/ig" "$file"
+		sed -i "s|$searchterm|$replaceterm|ig" "$file"
 		# change the modification date of the file back to the original date
 		touch -d @$MODTIME "$file"
 		echo "Modified: " "$file"

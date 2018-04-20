@@ -40,3 +40,6 @@ ps2pdf $filestem.ps
 [[ -f "$filestem.dvi" ]] && rm "$filestem.dvi"
 [[ -f "$filestem.ps" ]]  && rm "$filestem.ps"
 [[ -f "$filestem.log" ]] && rm "$filestem.log"
+[[ -f "$filestem.toc" ]] && rm "$filestem.toc"
+[[ -f "$filestem.snm" ]] && rm "$filestem.snm"
+[[ -f "$filestem.vrb" ]] && rm "$filestem.vrb"

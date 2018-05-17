@@ -1,0 +1,97 @@
+#!/bin/sh
+
+### Test usage; if incorrect, output correct usage and exit
+# if [ "$#" -gt 3  -o  "$#" -eq 2  -o  "$#" -eq 1  -o  "$#" -eq 0 ]; then
+# 	echo "Syntax error"
+# 	exit
+# fi
+
+# Stem and extension of file
+filestem1=`echo $1 | cut -f1 -d.`
+filestem2=`echo $2 | cut -f1 -d.`
+outputstem=`echo $3 | cut -f1 -d.`
+extension1=`echo $1 | cut -f2 -d.`
+extension2=`echo $2 | cut -f2 -d.`
+outputext=`echo $3 | cut -f2 -d.`
+
+### Test if file1 exists
+if [[ ! -r $1 ]]; then
+	echo -e "\n File does not exist, or option mispecified \n"
+	exit
+fi
+
+### Test if file2 exists
+if [[ ! -r $2 ]]; then
+	echo -e "\n File does not exist, or option mispecified \n"
+	exit
+fi
+
+### Test file1 extension
+if [[ $extension1 != tex ]]; then
+	echo -e "\n Invalid input file, must be a tex-file \n"
+	exit
+fi
+
+### Test file2 extension
+if [[ $extension2 != tex ]]; then
+	echo -e "\n Invalid input file, must be a tex-file \n"
+	exit
+fi
+
+### Test output file extension
+if [[ $outputext != pdf ]]; then
+	echo -e "\n Invalid output file, must be a pdf-file \n"
+	exit
+fi
+
+### Compile first document
+latex $filestem1.tex
+bibtex $filestem1.aux
+latex $filestem1.tex
+bibtex $filestem1.aux
+bibtex $filestem1.aux
+latex $filestem1.tex
+bibtex $filestem1.aux
+latex $filestem1.tex
+latex $filestem1.tex
+dvips -P pdf $filestem1.dvi
+ps2pdf $filestem1.ps
+[[ -f "$filestem1.bbl" ]] && rm "$filestem1.bbl"
+[[ -f "$filestem1.out" ]] && rm "$filestem1.out"
+[[ -f "$filestem1.aux" ]] && rm "$filestem1.aux"
+[[ -f "$filestem1.blg" ]] && rm "$filestem1.blg"
+[[ -f "$filestem1.nav" ]] && rm "$filestem1.nav"
+[[ -f "$filestem1.dvi" ]] && rm "$filestem1.dvi"
+[[ -f "$filestem1.ps" ]]  && rm "$filestem1.ps"
+[[ -f "$filestem1.log" ]] && rm "$filestem1.log"
+[[ -f "$filestem1.toc" ]] && rm "$filestem1.toc"
+[[ -f "$filestem1.snm" ]] && rm "$filestem1.snm"
+[[ -f "$filestem1.vrb" ]] && rm "$filestem1.vrb"
+
+### Compile second document
+latex $filestem2.tex
+bibtex $filestem2.aux
+latex $filestem2.tex
+bibtex $filestem2.aux
+bibtex $filestem2.aux
+latex $filestem2.tex
+bibtex $filestem2.aux
+latex $filestem2.tex
+latex $filestem2.tex
+dvips -P pdf $filestem2.dvi
+ps2pdf $filestem2.ps
+[[ -f "$filestem2.bbl" ]] && rm "$filestem2.bbl"
+[[ -f "$filestem2.out" ]] && rm "$filestem2.out"
+[[ -f "$filestem2.aux" ]] && rm "$filestem2.aux"
+[[ -f "$filestem2.blg" ]] && rm "$filestem2.blg"
+[[ -f "$filestem2.nav" ]] && rm "$filestem2.nav"
+[[ -f "$filestem2.dvi" ]] && rm "$filestem2.dvi"
+[[ -f "$filestem2.ps" ]]  && rm "$filestem2.ps"
+[[ -f "$filestem2.log" ]] && rm "$filestem2.log"
+[[ -f "$filestem2.toc" ]] && rm "$filestem2.toc"
+[[ -f "$filestem2.snm" ]] && rm "$filestem2.snm"
+[[ -f "$filestem2.vrb" ]] && rm "$filestem2.vrb"
+
+### Concatenate documents
+gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress -sOutputFile=$outputstem.pdf $filestem1.pdf $filestem2.pdf
+

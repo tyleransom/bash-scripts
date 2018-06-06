@@ -20,13 +20,14 @@ else
 	# Stem and extension of file
 	filestem=`echo $1 | cut -f1 -d.`
 	extension=`echo $1 | cut -f2 -d.`
+    extension=`echo "$extension" | awk '{print tolower($0)}'`
 
 	# Test if file exist
 	if [[ ! -r $1 ]]; then
 		echo ""
 		echo "File does not exist"
 		echo ""
-	elif [[ $extension != R ]]; then
+	elif [[ $extension != r ]]; then
 		echo ""
 		echo "Invalid input file, must be an R-file"
 		echo ""

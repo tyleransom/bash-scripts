@@ -43,3 +43,4 @@ ps2pdf $filestem.ps
 [[ -f "$filestem.toc" ]] && rm "$filestem.toc"
 [[ -f "$filestem.snm" ]] && rm "$filestem.snm"
 [[ -f "$filestem.vrb" ]] && rm "$filestem.vrb"
+[[ -f "$filestem.out.ps" ]] && rm "$filestem.out.ps"
